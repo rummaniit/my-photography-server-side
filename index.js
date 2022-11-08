@@ -1,5 +1,5 @@
 // requires
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
@@ -14,9 +14,66 @@ const port = process.env.port || 5000
 
 // connect to Mongodb
 
-const uri = "mongodb+srv://<username>:<password>@cluster0.xteb5ll.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.xteb5ll.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+async function run() {
+    await client.connect()
+    console.log("Data is Connected");
+    const serviceCollections = client.db('photography').collection('services')
+    const reviewsCollections = client.db('photography').collection('reviews')
+
+    try {
+        app.get('/services', async (req, res) => {
+            const query = {}
+            const cuesor = serviceCollections.find(query)
+            const services = await cuesor.toArray()
+            res.send(services)
+        })
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) };
+            const result = await serviceCollections.findOne(query);
+            res.send(result)
+        })
+
+
+        app.get('/reviews', async (req, res) => {
+            const query = {}
+            const cuesor = reviewsCollections.find(query)
+            const reviews = await cuesor.toArray()
+            res.send(reviews)
+        })
+
+        app.get('/reviews/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) };
+            const result = await reviewsCollections.findOne(query);
+            res.send(result)
+        })
+
+        app.post('/reviews', async (req, res) => {
+            let reviews = req.body
+            const result = await reviewsCollections.insertOne(reviews);
+            res.send(result)
+        })
+    }
+    finally {
+        console.log('All is Looking god');
+    }
+
+}
+run()
+
+
+
+
+// photography
+// services
+
+
+
+// testing
 app.get('/', (req, res) => {
     res.send('Api is running')
 })
