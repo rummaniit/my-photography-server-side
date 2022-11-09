@@ -22,6 +22,7 @@ async function run() {
     console.log("Data is Connected");
     const serviceCollections = client.db('photography').collection('services')
     const reviewsCollections = client.db('photography').collection('reviews')
+    const userCollections = client.db('photography').collection('signedusers')
 
     try {
         app.get('/services', async (req, res) => {
@@ -56,6 +57,24 @@ async function run() {
             let reviews = req.body
             const result = await reviewsCollections.insertOne(reviews);
             res.send(result)
+        })
+
+        app.post('/users', async (req, res) => {
+            let users = req.body
+            const result = await userCollections.insertOne(users);
+            res.send(result)
+        })
+
+
+        app.get('/users', async (req, res) => {
+            let query = {}
+            if (req.query.email) {
+                query = { email: req.query.email };
+            }
+            const result = userCollections.find(query);
+            const users = await result.toArray()
+            res.send(users)
+
         })
     }
     finally {
