@@ -1,5 +1,5 @@
 // requires
-const { MongoClient, ServerApiVersion, ObjectId, ObjectID } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
@@ -54,8 +54,8 @@ async function run() {
         })
         app.delete('/reviews/:id', async (req, res) => {
             const id = req.params.id
-            const query = { _id: ObjectID(id) };
-            const result = await userCollections.deleteOne(query);
+            const query = { _id: ObjectId(id) };
+            const result = await reviewsCollections.deleteOne(query);
             // const result = await cursor.toArray()
             res.send(result)
 
