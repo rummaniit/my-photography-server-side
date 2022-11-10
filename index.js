@@ -44,7 +44,7 @@ async function run() {
     const userCollections = client.db('photography').collection('signedusers')
 
     try {
-        app.get('/services', async (req, res) => {
+        app.get('/services', verifyJWT, async (req, res) => {
             const query = {}
             const cuesor = serviceCollections.find(query)
             const services = await cuesor.toArray()
@@ -63,7 +63,7 @@ async function run() {
         })
 
 
-        app.get('/reviews', async (req, res) => {
+        app.get('/reviews', verifyJWT, async (req, res) => {
             const query = {}
             const cuesor = reviewsCollections.find(query)
             const reviews = await cuesor.toArray()
