@@ -37,6 +37,11 @@ async function run() {
             const result = await serviceCollections.findOne(query);
             res.send(result)
         })
+        app.post('/services', async (req, res) => {
+            let services = req.body
+            const result = await serviceCollections.insertOne(services);
+            res.send(result)
+        })
 
 
         app.get('/reviews', async (req, res) => {
@@ -61,14 +66,41 @@ async function run() {
 
         })
 
+        app.put('/reviews/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) };
+            const rev = req.body
+            const option = { upsert: true }
+            const updateRev = {
+                $set: {
+                    name: rev.name,
+                    ratings: rev.retings
+                }
+            }
+            const result = await reviewsCollections.updateOne(query, updateRev, option)
+            res.send(result)
+        })
+        reviewsCollections.updateMany(
+            {
+                updatedAt: { $exists: false }
+            },
+            {
+                $currentDate: {
+                    updatedAt: true
+                }
+            },
+            {}
+        )
         app.post('/reviews', async (req, res) => {
             let reviews = req.body
+
             const result = await reviewsCollections.insertOne(reviews);
             res.send(result)
         })
 
         app.post('/users', async (req, res) => {
             let users = req.body
+
             const result = await userCollections.insertOne(users);
             res.send(result)
         })
