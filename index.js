@@ -133,7 +133,7 @@ async function run() {
 
             // res.send({ token })
             const user = req.body
-            var token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+            var token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
             res.send({ token })
             console.log(user);
         })
