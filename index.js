@@ -1,17 +1,20 @@
 // requires
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
-const cors = require('cors')
+const cors = require("cors")
+const app = express()
+app.use(cors({
+    methods: ['GET', 'POST', 'DELETE', 'PUT']
+}));
 require('dotenv').config()
-var jwt = require('jsonwebtoken');
+// var jwt = require('jsonwebtoken');
 
 // calling
-const app = express()
-app.use(cors())
 app.use(express.json())
+// const app = connect()
 
 // Port number selection
-const port = process.env.port || 5000
+const port = process.env.PORT || 5000
 
 // connect to Mongodb
 
@@ -19,23 +22,23 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
-function verifyJWT(req, res, next) {
-    const authorize = req.headers.authorization
-    // let decoded=req.decoded
-    if (!authorize) {
-        res.status(401).send({
-            message: 'unauthorised access'
-        })
-    }
-    const token = authorize.split(' ')[1]
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            res.status(403).send({ message: 'unauthorised access' })
-        }
-        req.decoded = decoded
-        next()
-    })
-}
+// function verifyJWT(req, res, next) {
+//     const authorize = req.headers.authorization
+//     // let decoded=req.decoded
+//     if (!authorize) {
+//         res.status(401).send({
+//             message: 'unauthorised access'
+//         })
+//     }
+//     const token = authorize.split(' ')[1]
+//     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+//         if (err) {
+//             res.status(403).send({ message: 'unauthorised access' })
+//         }
+//         req.decoded = decoded
+//         next()
+//     })
+// }
 async function run() {
     await client.connect()
     console.log("Data is Connected");
@@ -46,8 +49,8 @@ async function run() {
     try {
         app.get('/services', async (req, res) => {
             const query = {}
-            const cuesor = serviceCollections.find(query)
-            const services = await cuesor.toArray()
+            const cursor = serviceCollections.find(query)
+            const services = await cursor.toArray()
             res.send(services)
         })
         app.get('/services/:id', async (req, res) => {
@@ -112,13 +115,11 @@ async function run() {
         )
         app.post('/reviews', async (req, res) => {
             let reviews = req.body
-
             const result = await reviewsCollections.insertOne(reviews);
             res.send(result)
         })
 
         app.post('/users', async (req, res) => {
-
             let users = req.body
             const result = await userCollections.insertOne(users);
             res.send(result)
@@ -139,7 +140,8 @@ async function run() {
         })
 
 
-        app.get('/users', verifyJWT, async (req, res) => {
+
+        app.get('/users', async (req, res) => {
             console.log(req.headers.authorization);
             let decoded = req.decoded
             if (decoded.email !== req.query.email) {
