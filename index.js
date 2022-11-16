@@ -3,9 +3,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const cors = require("cors")
 const app = express()
-app.use(cors({
-    methods: ['GET', 'POST', 'DELETE', 'PUT']
-}));
+app.use(cors());
 require('dotenv').config()
 // var jwt = require('jsonwebtoken');
 
@@ -160,7 +158,7 @@ async function run() {
         })
     }
     finally {
-        console.log('All is Looking god');
+        console.log('All is Looking good');
     }
 
 
